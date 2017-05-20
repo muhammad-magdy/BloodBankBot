@@ -2,10 +2,9 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var path = require('path');
-var bloodBankBot = require(path.resolve( __dirname,'./Bot/bloodBankBot'));
+var bloodBankBot = require(path.resolve( __dirname,'./Bot/bloodBankBot.js'));
 var mongoose=require('mongoose');
 mongoose.Promise = global.Promise
-// mongoose.connect('mongodb://db_admin:moh%40moha@ds062339.mlab.com:62339/bloodbankbot', { uri_decode_auth: true });
 const dbConnect= function()
 {
   mongoose.connect(process.env.DB_ConnectionString, { uri_decode_auth: true },
