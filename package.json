@@ -1,0 +1,23 @@
+{
+  "name": "bloodbankbot",
+  "version": "1.0.0",
+  "description": "Help save a life today by donating blood to those in need",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "lint": "esw Users.js index.js Services Bot Models Controllers --color",
+    "lint:watch": "npm run lint -- --watch"
+  },
+  "author": "Mohamed Magdy",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "express": "^4.15.2",
+    "localizify": "^1.1.2",
+    "mongoose": "^4.9.7",
+    "npm": "^4.5.0",
+    "request": "^2.81.0",
+    "util": "^0.10.3"
+  }
+}
