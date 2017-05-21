@@ -28,7 +28,7 @@ exports.getUserLanguage = function (userId,cb) {
 
 exports.getMatchedBloodDonors = function (userId, compatibleBloodTypes,location,donationType, cb) {
   bloodbankUser.find({
-    // _id: { $ne: userId },
+     _id: { $ne: userId },
     "donor.bloodType": { $in: compatibleBloodTypes },
     "donor.donationType": { $in: ["All",donationType] },
     "donor.location":{ $near: { $geometry:{type: 'Point', coordinates:[location.long, location.lat]},
