@@ -2,7 +2,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var path = require('path');
-var bloodBankBot = require(path.resolve( __dirname,'./Bot/bloodBankBot'));
+var bloodBankBot = require('./Bot/bloodBankBot');
 var mongoose=require('mongoose');
 mongoose.Promise = global.Promise
 const dbConnect= function()

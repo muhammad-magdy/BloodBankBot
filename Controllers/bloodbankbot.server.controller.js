@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
-var path = require('path');
-var bloodbankUser = require(path.resolve(__dirname, '../Models/bloodbankbot.server.model'));
+var bloodbankUser = require('../Models/bloodbankbot.server.model');
 
 exports.create = function (userId, userData) {
   bloodbankUser.findOne({ _id: userId }, { _id: 1 }, function (err, result) {

@@ -3,12 +3,12 @@ const localizify = require('localizify');
 var request = require('request');
 var path = require('path');
 var events = require('events');
-var usersDictionary = require(path.resolve( __dirname,'../Users'));
-var googleMapsClientService = require(path.resolve( __dirname,'../Services/googleMapsClientService'));
-var bloodbankUserCtrl=require(path.resolve( __dirname,'../Controllers/bloodbankbot.server.controller'));
+var usersDictionary = require('../Users.js');
+var googleMapsClientService = require('../Services/googleMapsClientService');
+var bloodbankUserCtrl=require('../Controllers/bloodbankbot.server.controller');
 
-const en = require(path.resolve( __dirname,'./messages/en.json'));
-const ar = require(path.resolve( __dirname,'./messages/ar.json'));
+const en = require('./messages/en.json');
+const ar = require('./messages/ar.json');
 
 const compatiblePlateletsTypes=[
           {
