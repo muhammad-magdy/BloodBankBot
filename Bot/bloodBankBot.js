@@ -7,8 +7,8 @@ var usersDictionary = require('../Users.js');
 var googleMapsClientService = require('../Services/googleMapsClientService');
 var bloodbankUserCtrl=require('../Controllers/bloodbankbot.server.controller');
 
-const en = require('./messages/en.json');
-const ar = require('./messages/ar.json');
+const en = require('./Messages/en.json');
+const ar = require('./Messages/ar.json');
 
 const compatiblePlateletsTypes=[
           {
