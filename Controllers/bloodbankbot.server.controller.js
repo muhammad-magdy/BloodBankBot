@@ -1,25 +1,20 @@
 /* eslint-disable no-console */
 var bloodbankUser = require('../Models/bloodbankbot.server.model');
 
-exports.create = function (userId, userData) {
-  bloodbankUser.findOne({ _id: userId }, { _id: 1 }, function (err, result) {
-    if(err)
-    console.log("error: "+ err);
-    console.log("userId: "+ userId);
-    console.log("result: "+ result);
-    if (result!='undefined' &&result == null) {
-      var entry = new bloodbankUser({
+exports.create = function (userId, userData,cb) {
+var entry = new bloodbankUser({
         _id: userId,
-        Language: "EN",
+        Language: "",
         userInfo: userData,
       });
-      entry.save(function (err) {
-        if (err)
-          console.log("Cant Save  error:" + err);
-      });
-    }
-  });
+      entry.save(cb);
+}
+
+
+exports.isUserExist = function (userId, cb) {
+  bloodbankUser.findOne({ _id: userId }, { _id: 1 }, cb);
 };
+
 
 exports.getUserLanguage = function (userId,cb) {
   bloodbankUser.findOne({ _id: userId }, { _id: 0, Language: 1 }, cb);
@@ -33,17 +28,14 @@ exports.getMatchedBloodDonors = function (userId, compatibleBloodTypes,location,
     "donor.location":{ $near: { $geometry:{type: 'Point', coordinates:[location.long, location.lat]},
                               $maxDistance:30000}
                      }
-  }, { _id: 1 }, cb);
+  }, { _id: 1,Language:1 }, cb);
 }
-exports.updateUserLanguage = function (userId, userLanguage) {
+exports.updateUserLanguage = function (userId, userLanguage, cb) {
   var condition = { _id: userId };
   var updateQuery = {
     Language: userLanguage
   };
-  bloodbankUser.update(condition, updateQuery, function (err) {
-    if (err)
-      console.log("can not update");
-  })
+  bloodbankUser.update(condition, updateQuery, cb);
 };
 
 exports.updateDonor = function (user) {
@@ -85,5 +77,3 @@ exports.updateRequests = function (user) {
       console.log("can not update :" + err);
   })
 };
-
-

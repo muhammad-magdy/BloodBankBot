@@ -1,22 +1,23 @@
 /* eslint-disable no-console */
+// require('dotenv').config();
 var express = require('express');
 var bodyParser = require('body-parser');
-var path = require('path');
 var bloodBankBot = require('./Bot/bloodBankBot');
 var mongoose=require('mongoose');
 mongoose.Promise = global.Promise
-const dbConnect= function()
-{
-  mongoose.connect(process.env.DB_ConnectionString, { uri_decode_auth: true },
-function(error) {
-  if(error)
-  console.log(error);
-  else{
-    console.log("Connected");
-  }
-});
+
+const dbConnect = function () {
+  mongoose.connect(process.env.DB_mlabConnectionString, { uri_decode_auth: true },
+    function (error) {
+      if (error)
+        console.log(error);
+      else {
+        console.log("Connected");
+      }
+    });
 }
 dbConnect();
+
 mongoose.connection.on('disconnected', () => {
   console.log("faslt");
         setTimeout(dbConnect, 5000);

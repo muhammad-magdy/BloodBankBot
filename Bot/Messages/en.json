@@ -2,6 +2,7 @@
   "phoneNumber":"Would you please tell me your phone number without country code ex(010618464....) to share it with Donors, So they can reach you ?",
   "invalidPhoneNumber":"Invalid Phone number!!! Please provide correct one",
   "greeting":"{name} welcome to Blood Bank Bot!!\nPlease choose your language?",
+  "changeLanguage":"Please choose your language?",
   "userTypeQuestion":"How can i help you?",
   "donor":"I am a Donor",
   "patient":"Requesting Blood",
