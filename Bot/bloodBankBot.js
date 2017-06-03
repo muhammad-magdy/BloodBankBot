@@ -222,21 +222,29 @@ exports.receivedMessage = function (event) {
     messageAttachments.forEach(function (attachment) {
       if (attachment.type == "location") {
         var coordinates = attachment.payload.coordinates;
-        googleMapsClientService.getUserAddress(coordinates.lat, coordinates.long, function (err,body) {
+        googleMapsClientService.getUserAddress(coordinates.lat, coordinates.long, function (err, body) {
           var location = {
-            address: (body.results[0]!=undefined)?body.results[0].formatted_address:"",
+            address: (body.results[0] != undefined) ? body.results[0].formatted_address : "",
             lat: coordinates.lat,
             long: coordinates.long
           };
-          AddorUpdateUserDict(senderID, null, null, null, null, null, location,null,null);
-          var user=users.getUser(senderID);
-          if (user.isDonor) {
-            bloodbankUserCtrl.updateDonor(user);
-            sendTextMessage(senderID, localizify.t('donorSaveMsg',{name:user.userInfo.first_name}));
-          }
-          else {
-            sendTextMessage(senderID, localizify.t('phoneNumber'));
-          }
+          AddorUpdateUserDict(senderID, null, null, null, null, null, location, null, null);
+          var user = users.getUser(senderID);
+          bloodbankUserCtrl.getUserLanguage(senderID, function (error, doc) {
+            var lang = "en";
+            console.log("Language inside location :"+ doc);
+            if (doc && doc != "undefined" && doc.Language != "") {
+              lang = doc.Language;
+            }
+            localizify.setLocale(lang);
+            if (user.isDonor) {
+              bloodbankUserCtrl.updateDonor(user);
+              sendTextMessage(senderID, localizify.t('donorSaveMsg', { name: user.userInfo.first_name }));
+            }
+            else {
+              sendTextMessage(senderID, localizify.t('phoneNumber'));
+            }
+          });
         });
       }
       else if(attachment.type == "image"){
