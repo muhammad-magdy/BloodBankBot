@@ -7,7 +7,7 @@ var mongoose=require('mongoose');
 mongoose.Promise = global.Promise
 
 const dbConnect = function () {
-  mongoose.connect(process.env.DB_mlabConnectionString, { uri_decode_auth: true },
+  mongoose.connect(process.env.DB_ConnectionString, { uri_decode_auth: true },
     function (error) {
       if (error)
         console.log(error);

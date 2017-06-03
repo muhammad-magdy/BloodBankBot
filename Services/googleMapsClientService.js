@@ -1,4 +1,5 @@
-const GoogleGeoURL = 'https://maps.googleapis.com/maps/api/geocode/json'
+// require('dotenv').config();
+const GoogleGeoURL = 'https://maps.googleapis.com/maps/api/geocode/json';
 var request = require('request');
 var getUserAddress = function (userLat, userLng, callback) {
   var latlng = userLat + ', ' + userLng;

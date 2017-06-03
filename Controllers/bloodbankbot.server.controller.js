@@ -20,15 +20,19 @@ exports.getUserLanguage = function (userId,cb) {
   bloodbankUser.findOne({ _id: userId }, { _id: 0, Language: 1 }, cb);
 }
 
-exports.getMatchedBloodDonors = function (userId, compatibleBloodTypes,location,donationType, cb) {
+exports.getMatchedBloodDonors = function (userId, compatibleBloodTypes, location, donationType, cb) {
   bloodbankUser.find({
-     _id: { $ne: userId },
+    _id: { $ne: userId },
+    "donor.isActive":{$ne:false},
     "donor.bloodType": { $in: compatibleBloodTypes },
-    "donor.donationType": { $in: ["All",donationType] },
-    "donor.location":{ $near: { $geometry:{type: 'Point', coordinates:[location.long, location.lat]},
-                              $maxDistance:30000}
-                     }
-  }, { _id: 1,Language:1 }, cb);
+    "donor.donationType": { $in: ["All", donationType] },
+    "donor.location": {
+      $near: {
+        $geometry: { type: 'Point', coordinates: [location.long, location.lat] },
+        $maxDistance: 25000
+      }
+    }
+  }, { _id: 1, Language: 1 }, cb);
 }
 exports.updateUserLanguage = function (userId, userLanguage, cb) {
   var condition = { _id: userId };

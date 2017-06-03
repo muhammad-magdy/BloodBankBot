@@ -11,7 +11,6 @@ var userInfoSchema = {
 
 var locationSchema = {
       type: { type: String },
-      // index: '2dsphere',
       coordinates: []
 }
 
@@ -47,4 +46,5 @@ var bloodBankBotSchema = new Schema({
     _id: false
   });
 bloodBankBotSchema.index({ "donor.location.coordinates": "2dsphere" });
+// bloodBankBotSchema.index({ "donor.location": "2dsphere" });
 module.exports = mongoose.model('bloodbankUser', bloodBankBotSchema);

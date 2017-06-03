@@ -141,7 +141,6 @@ exports.receivedMessage = function (event) {
       case 'Donor':
         bloodbankUserCtrl.getUserLanguage(senderID, function(error, doc){
         var lang="en";
-        console.log(doc);
         if (doc && doc.Language != "") {
           lang = doc.Language;
         }
@@ -160,7 +159,6 @@ exports.receivedMessage = function (event) {
       case 'Patient':
          bloodbankUserCtrl.getUserLanguage(senderID, function(error, doc){
         var lang = "en";
-        console.log(doc);
         if (doc && doc!="undefined" && doc.Language != "") {
           lang = doc.Language;
         }
@@ -216,19 +214,6 @@ exports.receivedMessage = function (event) {
         AddorUpdateUserDict(senderID, null, null, null, null, messageQuickReply.payload);
         sendLocation(senderID);
         break;
-      case '1':
-      case '2':
-      case '3':
-      case '4':
-      case '5':
-      case '6':
-      case '7':
-      case '8':
-      case '9':
-      case '10':
-        AddorUpdateUserDict(senderID, null, null, null, null, null, null, null, messageQuickReply.payload);
-        sendTextMessage(senderID, localizify.t('phoneNumber'));
-        break;
       default:
         handleOtherRecievedMessage(senderID);
     }
@@ -250,7 +235,7 @@ exports.receivedMessage = function (event) {
             sendTextMessage(senderID, localizify.t('donorSaveMsg',{name:user.userInfo.first_name}));
           }
           else {
-            sendNumberOfDonorsNeededQeustion(senderID);
+            sendTextMessage(senderID, localizify.t('phoneNumber'));
           }
         });
       }
@@ -270,6 +255,12 @@ exports.receivedMessage = function (event) {
       }
     }
     else {
+      bloodbankUserCtrl.getUserLanguage(recipientID, function(error, doc){
+        var lang = "en";
+        if (doc && doc!="undefined" && doc.Language != "") {
+          lang = doc.Language;
+        }
+        localizify.setLocale(lang);
       if(messageText ==localizify.t('PatientSaveMsg') ){
         user = users.getUser(recipientID);
         var userName=user.userInfo.first_name+ " "+ user.userInfo.last_name;
@@ -307,6 +298,8 @@ exports.receivedMessage = function (event) {
         };
         eventEmitter.on('PhoneNumberMessageEvent', handlePhoneNumberMessageEvent);
       }
+      });
+
     }
   }
 }
@@ -317,11 +310,9 @@ exports.receivedPostback = function (event) {
   var timeOfMessage = event.timestamp;
   var postback = event.postback;
 
-  console.log("Received postback for user %d and page %d at %d with message:",
-    senderID, recipientID, timeOfMessage);
-  console.log(JSON.stringify(postback));
-
+  console.log("Received postback for user %d and page %d at %d with message:",senderID, recipientID, timeOfMessage);
   var postbackPayload = postback.payload;
+
   if (postbackPayload) {
     switch (postbackPayload) {
       case 'BOT_GET_STARTED':
@@ -393,7 +384,7 @@ exports.receivedPostback = function (event) {
         sendLanguageQuestion(senderID);
         break;
       default:
-        // handleOtherRecievedMessage(senderID);
+        //  handleOtherRecievedMessage(senderID);
         break;
     }
   }
@@ -407,8 +398,7 @@ exports.setBotConfiguration = function () {
 
 
 function isPhoneNumberCorrect(PhoneNumber) {
-  var pattern = new RegExp("^01[0-9]{9}$");
-  // var pattern = new RegExp("^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,5})|(\(?\d{2,6}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$")
+  var pattern = new RegExp("^[0-9]{7}|[0-9]{8}|[0-9]{9}|[0-9]{10}|[0-9]{11}|[0-9]{12}|[0-9]{13}|[0-9]{14}|[0-9]{15}$");
   return pattern.test(PhoneNumber);
 }
 
@@ -764,68 +754,6 @@ function sendBloodTypeQeustion(recipientId) {
   callSendAPI(messageData);
 }
 
-function sendNumberOfDonorsNeededQeustion(recipientId) {
-  var messageData = {
-    recipient: { id: recipientId },
-    message: {
-      text: localizify.t('donorsNumber'),
-      quick_replies: [
-        {
-          "content_type": "text",
-          "title": "1",
-          "payload": "1"
-        },
-        {
-          "content_type": "text",
-          "title": "2",
-          "payload": "2"
-        },
-        {
-          "content_type": "text",
-          "title": "3",
-          "payload": "3"
-        },
-        {
-          "content_type": "text",
-          "title": "4",
-          "payload": "4"
-        },
-        {
-          "content_type": "text",
-          "title": "5",
-          "payload": "5"
-        },
-        {
-          "content_type": "text",
-          "title": "6",
-          "payload": "6"
-        },
-        {
-          "content_type": "text",
-          "title": "7",
-          "payload": "7"
-        },
-        {
-          "content_type": "text",
-          "title": "8",
-          "payload": "8"
-        },
-        {
-          "content_type": "text",
-          "title": "9",
-          "payload": "9"
-        },
-        {
-          "content_type": "text",
-          "title": "10",
-          "payload": "10"
-        }
-      ]
-    }
-  };
-  callSendAPI(messageData);
-}
-
 function getProfile(userId, callback) {
   const USER_URL = `${FB_URL}${userId}`;
   request.get(
@@ -874,7 +802,7 @@ function setPersistent_menu() {
         },
         {
           "locale": "ar_AR",
-          "composer_input_disabled": true,
+          "composer_input_disabled": false,
           "call_to_actions": [
             {
               "title": "انا متبرع",
@@ -882,7 +810,7 @@ function setPersistent_menu() {
               "payload": "Donor"
             },
             {
-              "title": "محتاج دم",
+              "title": "محتاج متبرع بالدم",
               "type": "postback",
               "payload": "Patient"
             },
