@@ -40,6 +40,8 @@ var bloodBankBotSchema = new Schema({
   userInfo: userInfoSchema,
   donor: donorSchema,
   requests: [requestSchema],
+  isWaitingForPhoneNumber:{ type: Boolean, default: false },
+  isDonor:{ type: Boolean, default: false },
   createdOn: { type: Date, default: Date.now }
 },
   {
@@ -48,3 +50,5 @@ var bloodBankBotSchema = new Schema({
 bloodBankBotSchema.index({ "donor.location.coordinates": "2dsphere" });
 // bloodBankBotSchema.index({ "donor.location": "2dsphere" });
 module.exports = mongoose.model('bloodbankUser', bloodBankBotSchema);
+
+

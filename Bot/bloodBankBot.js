@@ -139,60 +139,48 @@ exports.receivedMessage = function (event) {
   if (messageQuickReply && messageQuickReply.payload) {
     switch (messageQuickReply.payload) {
       case 'Donor':
-        bloodbankUserCtrl.getUserLanguage(senderID, function(error, doc){
-        var lang="en";
-        if (doc && doc.Language != "") {
-          lang = doc.Language;
-        }
-         localizify.setLocale(lang);
-          if (users.getUser(senderID) == null) {
-          getProfile(senderID, function (err, userInfo) {
-            users.addOrUpdateUser(senderID, userInfo, true,false,lang);
+        bloodbankUserCtrl.getUserData(senderID, function (error, doc) {
+          var lang = "en";
+          if (doc && doc.Language != "") {
+            lang = doc.Language;
+          }
+          bloodbankUserCtrl.setIsDonor(senderID, true, function (err) {
+            if (err) {
+              console.log(err);
+            }
+            sendDonorBloodDonationTypeQeustion(senderID, lang);
           });
-        }
-        else{
-          AddorUpdateUserDict(senderID, true,false);
-        }
-        sendDonorBloodDonationTypeQeustion(senderID);
         });
         break;
       case 'Patient':
-         bloodbankUserCtrl.getUserLanguage(senderID, function(error, doc){
-        var lang = "en";
-        if (doc && doc!="undefined" && doc.Language != "") {
-          lang = doc.Language;
-        }
-        localizify.setLocale(lang);
-        if (users.getUser(senderID) == null) {
-          getProfile(senderID, function (err, userInfo) {
-            users.addOrUpdateUser(senderID, userInfo, false, false, lang);
-          });
-        }
-        else {
-            AddorUpdateUserDict(senderID, false, false);
+        bloodbankUserCtrl.getUserData(senderID, function (error, doc) {
+          var lang = "en";
+          if (doc && doc != "undefined" && doc.Language != "") {
+            lang = doc.Language;
           }
-        sendPatientBloodDonationTypeQeustion(senderID);
+          bloodbankUserCtrl.setIsDonor(senderID, false, function (err) {
+            if (err) {
+              console.log(err);
+            }
+            sendPatientBloodDonationTypeQeustion(senderID, lang);
+          });
         });
         break;
       case 'ar':
-        localizify.setLocale('ar');
         bloodbankUserCtrl.updateUserLanguage(senderID, "ar", function (err) {
           if (err)
             console.log("can not update : "+ err);
           else {
-            AddorUpdateUserDict(senderID, null, null, 'ar');
-            sendUserTypeQeustionMessage(senderID);
+            sendUserTypeQeustionMessage(senderID,'ar');
           }
         });
         break;
       case 'en':
-        localizify.setLocale('en');
         bloodbankUserCtrl.updateUserLanguage(senderID, "en", function (err) {
           if (err)
             console.log("can not update: :"+ err);
           else {
-            AddorUpdateUserDict(senderID, null, null, 'en');
-            sendUserTypeQeustionMessage(senderID);
+            sendUserTypeQeustionMessage(senderID,'en');
           }
         });
         break;
@@ -200,7 +188,7 @@ exports.receivedMessage = function (event) {
       case 'Plasma':
       case 'Platelets':
       case 'All':
-        AddorUpdateUserDict(senderID, null, null, null,messageQuickReply.payload);
+        users.addOrUpdateUser(senderID, messageQuickReply.payload);
         sendBloodTypeQeustion(senderID);
         break;
       case 'A+':
@@ -211,8 +199,16 @@ exports.receivedMessage = function (event) {
       case 'AB-':
       case 'O+':
       case 'O-':
-        AddorUpdateUserDict(senderID, null, null, null, null, messageQuickReply.payload);
-        sendLocation(senderID);
+        users.addOrUpdateUser(senderID, null, messageQuickReply.payload);
+        bloodbankUserCtrl.getUserData(senderID, function (err, doc) {
+          if (err)
+            console.log(err);
+          var lang = "en";
+          if (doc && doc != "undefined" && doc.Language != "") {
+            lang = doc.Language;
+          }
+          sendLocation(senderID, lang);
+        });
         break;
       default:
         handleOtherRecievedMessage(senderID);
@@ -228,18 +224,17 @@ exports.receivedMessage = function (event) {
             lat: coordinates.lat,
             long: coordinates.long
           };
-          AddorUpdateUserDict(senderID, null, null, null, null, null, location, null, null);
+          users.addOrUpdateUser(senderID, null, null, location);
           var user = users.getUser(senderID);
-          bloodbankUserCtrl.getUserLanguage(senderID, function (error, doc) {
+          bloodbankUserCtrl.getUserData(senderID, function (error, doc) {
             var lang = "en";
-            console.log("Language inside location :"+ doc);
             if (doc && doc != "undefined" && doc.Language != "") {
               lang = doc.Language;
             }
             localizify.setLocale(lang);
-            if (user.isDonor) {
+            if (doc && doc != "undefined" && doc.isDonor == true) {
               bloodbankUserCtrl.updateDonor(user);
-              sendTextMessage(senderID, localizify.t('donorSaveMsg', { name: user.userInfo.first_name }));
+              sendTextMessage(senderID, localizify.t('donorSaveMsg', { name: doc.userInfo.first_name }));
             }
             else {
               sendTextMessage(senderID, localizify.t('phoneNumber'));
@@ -254,64 +249,82 @@ exports.receivedMessage = function (event) {
   }
   else if (messageText) {
     if (!messageIs_echo) {
-      var user = users.getUser(senderID);
-      if (user && user.isWaitingforPhoneNumberResponse) {
-        eventEmitter.emit('PhoneNumberMessageEvent', messageText, senderID);
-      }
-      else {
-        handleOtherRecievedMessage(senderID);
-      }
+      bloodbankUserCtrl.getUserData(senderID, function (error, doc) {
+        if(error)
+          console.log(error);
+        if (!error && doc && doc != "undefined" && doc.isWaitingForPhoneNumber) {
+          eventEmitter.emit('PhoneNumberMessageEvent', messageText, senderID);
+        }
+        else {
+          handleOtherRecievedMessage(senderID);
+        }
+      });
     }
     else {
-      bloodbankUserCtrl.getUserLanguage(recipientID, function(error, doc){
+      bloodbankUserCtrl.getUserData(recipientID, function(error, doc){
         var lang = "en";
         if (doc && doc!="undefined" && doc.Language != "") {
           lang = doc.Language;
         }
         localizify.setLocale(lang);
-      if(messageText ==localizify.t('PatientSaveMsg') ){
-        user = users.getUser(recipientID);
-        var userName=user.userInfo.first_name+ " "+ user.userInfo.last_name;
-        var matchedBloodTypes = getMatchedBloodTypes(user.donationType, user.bloodType);
-        bloodbankUserCtrl.getMatchedBloodDonors(recipientID,matchedBloodTypes,user.location,user.donationType,function(err,docs){
-          if(err)
-          console.log(err);
-          if (docs) {
-            docs.forEach(function (doc) {
-              sendBloodRequestMessage(doc._id, doc.Language, user.phoneNumber, userName);
-            });
-          }
-        });
-        bloodbankUserCtrl.getUserLanguage(recipientID, function (err, doc) {
-          if (doc && doc.Language != "") {
-            localizify.setLocale(doc.Language);
-          }
-        });
-        sendImageMessage(recipientID,'https://raw.githubusercontent.com/muhammad-magdy/BloodBankBot/master/images/SearchingBloodDonors.png');
-      }
-     else if (messageText == localizify.t('phoneNumber')) {
-        AddorUpdateUserDict(recipientID, null, true);
-        var handlePhoneNumberMessageEvent = function (message, senderID) {
-          if (isPhoneNumberCorrect(message)) {
-            AddorUpdateUserDict(senderID, null, false, null, null, null, null,message,null);
-            eventEmitter.removeListener('PhoneNumberMessageEvent', handlePhoneNumberMessageEvent);
-            var user=users.getUser(senderID);
-            bloodbankUserCtrl.updateRequests(user);
-            sendTextMessage(senderID, localizify.t('PatientSaveMsg'));
-          }
-          else {
-            // var lang = users.getUserLanguage(senderID);
-            sendTextMessage(senderID, localizify.t('invalidPhoneNumber'));
-          }
-        };
-        eventEmitter.on('PhoneNumberMessageEvent', handlePhoneNumberMessageEvent);
-      }
+        if (messageText == localizify.t('PatientSaveMsg')) {
+          var user = users.getUser(recipientID);
+          var userName = doc.userInfo.first_name + " " + doc.userInfo.last_name;
+          var matchedBloodTypes = getMatchedBloodTypes(user.donationType, user.bloodType);
+          bloodbankUserCtrl.getMatchedBloodDonors(recipientID, matchedBloodTypes, user.location, user.donationType, function (err, docs) {
+            if (err)
+              console.log(err);
+            if (docs) {
+              docs.forEach(function (doc) {
+                sendBloodRequestMessage(doc._id, doc.Language, user.phoneNumber, userName);
+              });
+            }
+          });
+          localizify.setLocale(lang);
+          sendImageMessage(recipientID, 'https://raw.githubusercontent.com/muhammad-magdy/BloodBankBot/master/images/SearchingBloodDonors.png');
+        }
+        else if (messageText == localizify.t('phoneNumber')) {
+          bloodbankUserCtrl.setIsWaitingForPhoneNumber(recipientID, true, function (err) {
+            if (err) {
+              console.log(err);
+            }
+            eventEmitter.on('PhoneNumberMessageEvent', handlePhoneNumberMessageEvent);
+          });
+        }
       });
-
     }
   }
 }
-
+var handlePhoneNumberMessageEvent = function (message, senderID) {
+  bloodbankUserCtrl.getUserData(senderID, function (error, doc) {
+    if (error) {
+      console.log(error);
+    }
+    var lang = "en";
+    console.log(doc);
+    if (!error && doc && doc.isWaitingForPhoneNumber == true) {
+      if (doc && doc.Language != "") {
+        lang = doc.Language;
+      }
+      if (isPhoneNumberCorrect(message)) {
+        bloodbankUserCtrl.setIsWaitingForPhoneNumber(senderID, false, function (err) {
+          if (err) {
+            console.log(err);
+          }
+          eventEmitter.removeListener('PhoneNumberMessageEvent', handlePhoneNumberMessageEvent);
+          users.addOrUpdateUser(senderID, null, null, null, message);
+          bloodbankUserCtrl.updateRequests(users.getUser(senderID));
+          localizify.setLocale(lang);
+          sendTextMessage(senderID, localizify.t('PatientSaveMsg'));
+        });
+      }
+      else {
+        localizify.setLocale(lang);
+        sendTextMessage(senderID, localizify.t('invalidPhoneNumber'));
+      }
+    }
+  });
+};
 exports.receivedPostback = function (event) {
   var senderID = event.sender.id;
   var recipientID = event.recipient.id;
@@ -333,7 +346,9 @@ exports.receivedPostback = function (event) {
             gender: userInfo.gender
           };
           bloodbankUserCtrl.isUserExist(senderID, function (err, result) {
-            if(err)console.log(err);
+            if(err){
+              console.log(err);
+            }
             console.log(result);
             if (!err && result == null) {
               bloodbankUserCtrl.create(senderID, userData, function (err) {
@@ -349,43 +364,33 @@ exports.receivedPostback = function (event) {
         });
         break;
       case 'Donor':
-        // AddorUpdateUserDict(senderID, true, null);
-        bloodbankUserCtrl.getUserLanguage(senderID, function(error, doc){
-        var lang="en";
-        console.log(doc);
-        if (doc && doc.Language != "") {
-          lang = doc.Language;
-        }
-         localizify.setLocale(lang);
-          if (users.getUser(senderID) == null) {
-          getProfile(senderID, function (err, userInfo) {
-            users.addOrUpdateUser(senderID, userInfo, true,false,lang);
+        bloodbankUserCtrl.getUserData(senderID, function (error, doc) {
+          var lang = "en";
+          console.log(doc);
+          if (doc && doc.Language != "") {
+            lang = doc.Language;
+          }
+          bloodbankUserCtrl.setIsDonor(senderID, true, function (err) {
+            if (err) {
+              console.log(err);
+            }
+            sendDonorBloodDonationTypeQeustion(senderID, lang);
           });
-        }
-        else{
-          AddorUpdateUserDict(senderID, true,false);
-        }
-        sendDonorBloodDonationTypeQeustion(senderID);
         });
         break;
       case 'Patient':
-        // AddorUpdateUserDict(senderID, false, null);
-        bloodbankUserCtrl.getUserLanguage(senderID, function(error, doc){
-        var lang = "en";
-        console.log(doc);
-        if (doc && doc!="undefined" && doc.Language != "") {
-          lang = doc.Language;
-        }
-        localizify.setLocale(lang);
-        if (users.getUser(senderID) == null) {
-          getProfile(senderID, function (err, userInfo) {
-            users.addOrUpdateUser(senderID, userInfo, false, false, lang);
-          });
-        }
-        else {
-            AddorUpdateUserDict(senderID, false, false);
+        bloodbankUserCtrl.getUserData(senderID, function (error, doc) {
+          var lang = "en";
+          console.log(doc);
+          if (doc && doc != "undefined" && doc.Language != "") {
+            lang = doc.Language;
           }
-        sendPatientBloodDonationTypeQeustion(senderID);
+          bloodbankUserCtrl.setIsDonor(senderID, false, function (err) {
+            if (err) {
+              console.log(err);
+            }
+            sendPatientBloodDonationTypeQeustion(senderID, lang);
+          });
         });
         break;
       case 'Lang':
@@ -410,7 +415,8 @@ function isPhoneNumberCorrect(PhoneNumber) {
   return pattern.test(PhoneNumber);
 }
 
-function sendLocation(recipientId) {
+function sendLocation(recipientId, lang) {
+  localizify.setLocale(lang);
   var messageData = {
     recipient: {
       id: recipientId
@@ -510,14 +516,8 @@ function callSendAPI(messageData) {
   });
 }
 
-function AddorUpdateUserDict(userId, isDonor, isWaitingforPhoneNumberMsg,language, donationType, bloodType, location, phoneNumber, donorsNumber) {
-    users.addOrUpdateUser(userId,null, isDonor, isWaitingforPhoneNumberMsg,language, donationType, bloodType, location, phoneNumber, donorsNumber);
-}
-
-
-
-function sendUserTypeQeustionMessage(recipientId) {
-  users.addOrUpdateUser(recipientId, null, false, false);
+function sendUserTypeQeustionMessage(recipientId, lang) {
+    localizify.setLocale(lang);
     var textMsg = localizify.t('userTypeQuestion');
     var messageData = {
       recipient: { id: recipientId },
@@ -541,22 +541,20 @@ function sendUserTypeQeustionMessage(recipientId) {
 }
 
 function sendLanguageQuestion(userId) {
-  getProfile(userId, function (err, userInfo) {
-    bloodbankUserCtrl.getUserLanguage(userId, function(error,doc){
-      if(error)
-        console.log(error);
-      var lang = "en";
-      console.log(doc);
+  bloodbankUserCtrl.getUserData(userId, function (error, doc) {
+    if (error)
+      console.log(error);
+    var lang = "en";
+    console.log(doc);
     if (doc && doc.Language != "") {
       lang = doc.Language;
     }
     else {
-      if (userInfo.locale == "ar_AR") {
+      if (doc.userInfo.locale == "ar_AR") {
         lang = 'ar';
       }
     }
     localizify.setLocale(lang);
-    users.addOrUpdateUser(userId, userInfo, false, false);
     var messageData = {
       recipient: { id: userId },
       message: {
@@ -576,12 +574,11 @@ function sendLanguageQuestion(userId) {
       }
     };
     callSendAPI(messageData);
-    });
   });
 }
 
 function sendGreetingQuestion(userId, userData) {
-  bloodbankUserCtrl.getUserLanguage(userId, function (error, doc) {
+  bloodbankUserCtrl.getUserData(userId, function (error, doc) {
     var lang = "en";
     if (!error && doc && doc.Language != "") {
       lang = doc.Language;
@@ -592,7 +589,6 @@ function sendGreetingQuestion(userId, userData) {
       }
     }
     localizify.setLocale(lang);
-    users.addOrUpdateUser(userId, userData, false, false);
     var messageData = {
       recipient: { id: userId },
       message: {
@@ -619,7 +615,7 @@ function sendGreetingQuestion(userId, userData) {
 
 
 function handleOtherRecievedMessage(recipientId) {
-   bloodbankUserCtrl.getUserLanguage(recipientId, function(error,doc){
+   bloodbankUserCtrl.getUserData(recipientId, function(error,doc){
       if(error)
         console.log(error);
       var lang = "en";
@@ -650,7 +646,8 @@ function handleOtherRecievedMessage(recipientId) {
    });
 }
 
-function sendPatientBloodDonationTypeQeustion(recipientId) {
+function sendPatientBloodDonationTypeQeustion(recipientId, lang) {
+  localizify.setLocale(lang);
   var messageData = {
       recipient: { id: recipientId },
       message: {
@@ -678,7 +675,8 @@ function sendPatientBloodDonationTypeQeustion(recipientId) {
   callSendAPI(messageData);
 }
 
-function sendDonorBloodDonationTypeQeustion(recipientId) {
+function sendDonorBloodDonationTypeQeustion(recipientId, lang) {
+  localizify.setLocale(lang);
   var messageData = {
       recipient: { id: recipientId },
       message: {

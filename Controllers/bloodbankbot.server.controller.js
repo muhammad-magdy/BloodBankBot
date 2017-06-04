@@ -10,14 +10,32 @@ var entry = new bloodbankUser({
       entry.save(cb);
 }
 
+exports.setIsDonor = function (userId, value, cb) {
+  var condition = { _id: userId };
+  var updateQuery = {
+    $set: {
+      "isDonor": value,
+      "isWaitingForPhoneNumber": false
+    }
+  };
+  bloodbankUser.update(condition, updateQuery, cb);
+}
+
+exports.setIsWaitingForPhoneNumber = function (userId, value, cb) {
+  var condition = { _id: userId };
+  var updateQuery = {
+    $set: { "isWaitingForPhoneNumber": value }
+  };
+  bloodbankUser.update(condition, updateQuery, cb);
+}
 
 exports.isUserExist = function (userId, cb) {
   bloodbankUser.findOne({ _id: userId }, { _id: 1 }, cb);
 };
 
 
-exports.getUserLanguage = function (userId,cb) {
-  bloodbankUser.findOne({ _id: userId }, { _id: 0, Language: 1 }, cb);
+exports.getUserData = function (userId, cb) {
+  bloodbankUser.findOne({ _id: userId }, { _id: 0, Language: 1, isDonor: 1, isWaitingForPhoneNumber: 1, userInfo:1 }, cb);
 }
 
 exports.getMatchedBloodDonors = function (userId, compatibleBloodTypes, location, donationType, cb) {
@@ -37,7 +55,9 @@ exports.getMatchedBloodDonors = function (userId, compatibleBloodTypes, location
 exports.updateUserLanguage = function (userId, userLanguage, cb) {
   var condition = { _id: userId };
   var updateQuery = {
-    Language: userLanguage
+    Language: userLanguage,
+    isDonor: false,
+    isWaitingForPhoneNumber: false
   };
   bloodbankUser.update(condition, updateQuery, cb);
 };

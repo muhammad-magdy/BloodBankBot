@@ -3,24 +3,19 @@ class usersDictionary {
     this.users = [];
   }
 
-  addOrUpdateUser(userId, info, isDonor, isWaitingForPhoneNumberMsg, language, donationType, bloodType, location, phoneNumber, donorsNumber) {
+  addOrUpdateUser(userId, donationType, bloodType, location, phoneNumber) {
     if (!this._isExist(userId)) {
       var user = {
         id: userId,
-        isWaitingforPhoneNumberResponse: isWaitingForPhoneNumberMsg,
-        isDonor: isDonor,
         donationType: donationType,
         bloodType: bloodType,
         location: {},
-        phoneNumber: phoneNumber,
-        donorsNumber: donorsNumber,
-        userInfo: info,
-        language: language
+        phoneNumber: phoneNumber
       };
       this.users.push(user);
     }
     else {
-      this._updateUser(userId, isDonor, isWaitingForPhoneNumberMsg, language, donationType, bloodType, location, phoneNumber, donorsNumber);
+      this._updateUser(userId, donationType, bloodType, location, phoneNumber);
     }
   }
 
@@ -37,20 +32,11 @@ class usersDictionary {
     return exists;
   }
 
-  _updateUser(userId, isDonor, isWaitingforPhoneNumberResponse, language, donationType, bloodType, location, phoneNumber, donorsNumber) {
+  _updateUser(userId, donationType, bloodType, location, phoneNumber) {
     var isUpdated = false;
     if (this.users.length && this.users.length > 0) {
       for (var i = 0; i < this.users.length; i++) {
         if (this.users[i].id == userId) {
-          if (isDonor != null) {
-            this.users[i].isDonor = isDonor;
-          }
-          if (isWaitingforPhoneNumberResponse != null) {
-            this.users[i].isWaitingforPhoneNumberResponse = isWaitingforPhoneNumberResponse;
-          }
-          if (language != null) {
-            this.users[i].language = language;
-          }
           if (donationType != null) {
             this.users[i].donationType = donationType;
           }
@@ -62,9 +48,6 @@ class usersDictionary {
           }
           if (phoneNumber != null) {
             this.users[i].phoneNumber = phoneNumber;
-          }
-          if (donorsNumber != null) {
-            this.users[i].donorsNumber = donorsNumber;
           }
           isUpdated = true;
           break;
@@ -86,16 +69,6 @@ class usersDictionary {
     }
     return user;
   }
-
-  getUserLanguage(userId) {
-    var user = this.getUser(userId);
-    if (user && user.language) {
-      return user.language;
-    }
-    return 'EN';
-  }
 }
-
-
 module.exports = usersDictionary;
 
