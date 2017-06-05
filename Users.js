@@ -3,19 +3,20 @@ class usersDictionary {
     this.users = [];
   }
 
-  addOrUpdateUser(userId, donationType, bloodType, location, phoneNumber) {
+  addOrUpdateUser(userId, donationType, bloodType, location, phoneNumber, event) {
     if (!this._isExist(userId)) {
       var user = {
         id: userId,
         donationType: donationType,
         bloodType: bloodType,
         location: {},
-        phoneNumber: phoneNumber
+        phoneNumber: phoneNumber,
+        eventEmitter: event
       };
       this.users.push(user);
     }
     else {
-      this._updateUser(userId, donationType, bloodType, location, phoneNumber);
+      this._updateUser(userId, donationType, bloodType, location, phoneNumber, event);
     }
   }
 
@@ -32,13 +33,16 @@ class usersDictionary {
     return exists;
   }
 
-  _updateUser(userId, donationType, bloodType, location, phoneNumber) {
+  _updateUser(userId, donationType, bloodType, location, phoneNumber, event) {
     var isUpdated = false;
     if (this.users.length && this.users.length > 0) {
       for (var i = 0; i < this.users.length; i++) {
         if (this.users[i].id == userId) {
           if (donationType != null) {
             this.users[i].donationType = donationType;
+          }
+          if(event !=null){
+            this.users[i].eventEmitter = event;
           }
           if (bloodType != null) {
             this.users[i].bloodType = bloodType;

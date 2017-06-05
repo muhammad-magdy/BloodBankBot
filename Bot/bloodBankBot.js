@@ -120,7 +120,6 @@ localizify
   .setLocale('en');
 
 const FB_URL = 'https://graph.facebook.com/v2.6/';
-var eventEmitter = new events.EventEmitter();
 var users=new usersDictionary();
 
 exports.receivedMessage = function (event) {
@@ -153,6 +152,7 @@ exports.receivedMessage = function (event) {
         });
         break;
       case 'Patient':
+        users.addOrUpdateUser(senderID, null, null, null, null, new events.EventEmitter());
         bloodbankUserCtrl.getUserData(senderID, function (error, doc) {
           var lang = "en";
           if (doc && doc != "undefined" && doc.Language != "") {
@@ -189,7 +189,16 @@ exports.receivedMessage = function (event) {
       case 'Platelets':
       case 'All':
         users.addOrUpdateUser(senderID, messageQuickReply.payload);
-        sendBloodTypeQeustion(senderID);
+        bloodbankUserCtrl.getUserData(senderID, function (err, doc) {
+          if (err)
+            console.log(err);
+          var lang = "en";
+          if (doc && doc != "undefined" && doc.Language != "") {
+            lang = doc.Language;
+          }
+          sendBloodTypeQeustion(senderID, lang);
+        });
+
         break;
       case 'A+':
       case 'A-':
@@ -253,7 +262,8 @@ exports.receivedMessage = function (event) {
         if(error)
           console.log(error);
         if (!error && doc && doc != "undefined" && doc.isWaitingForPhoneNumber) {
-          eventEmitter.emit('PhoneNumberMessageEvent', messageText, senderID);
+          var user=users.getUser(senderID);
+          user.eventEmitter.emit('PhoneNumberMessageEvent', messageText, senderID);
         }
         else {
           handleOtherRecievedMessage(senderID);
@@ -263,7 +273,7 @@ exports.receivedMessage = function (event) {
     else {
       bloodbankUserCtrl.getUserData(recipientID, function(error, doc){
         var lang = "en";
-        if (doc && doc!="undefined" && doc.Language != "") {
+        if (doc && doc.Language != "") {
           lang = doc.Language;
         }
         localizify.setLocale(lang);
@@ -284,17 +294,19 @@ exports.receivedMessage = function (event) {
           sendImageMessage(recipientID, 'https://raw.githubusercontent.com/muhammad-magdy/BloodBankBot/master/images/SearchingBloodDonors.png');
         }
         else if (messageText == localizify.t('phoneNumber')) {
+          user=users.getUser(recipientID);
           bloodbankUserCtrl.setIsWaitingForPhoneNumber(recipientID, true, function (err) {
             if (err) {
               console.log(err);
             }
-            eventEmitter.on('PhoneNumberMessageEvent', handlePhoneNumberMessageEvent);
+            user.eventEmitter.on('PhoneNumberMessageEvent', handlePhoneNumberMessageEvent);
           });
         }
       });
     }
   }
 }
+
 var handlePhoneNumberMessageEvent = function (message, senderID) {
   bloodbankUserCtrl.getUserData(senderID, function (error, doc) {
     if (error) {
@@ -311,7 +323,8 @@ var handlePhoneNumberMessageEvent = function (message, senderID) {
           if (err) {
             console.log(err);
           }
-          eventEmitter.removeListener('PhoneNumberMessageEvent', handlePhoneNumberMessageEvent);
+          var user= users.getUser(senderID);
+          user.eventEmitter.removeListener('PhoneNumberMessageEvent', handlePhoneNumberMessageEvent);
           users.addOrUpdateUser(senderID, null, null, null, message);
           bloodbankUserCtrl.updateRequests(users.getUser(senderID));
           localizify.setLocale(lang);
@@ -379,6 +392,7 @@ exports.receivedPostback = function (event) {
         });
         break;
       case 'Patient':
+        users.addOrUpdateUser(senderID, null, null, null, null, new events.EventEmitter());
         bloodbankUserCtrl.getUserData(senderID, function (error, doc) {
           var lang = "en";
           console.log(doc);
@@ -708,7 +722,8 @@ function sendDonorBloodDonationTypeQeustion(recipientId, lang) {
   callSendAPI(messageData);
 }
 
-function sendBloodTypeQeustion(recipientId) {
+function sendBloodTypeQeustion(recipientId, lang) {
+  localizify.setLocale(lang);
   var messageData = {
     recipient: { id: recipientId },
     message: {
