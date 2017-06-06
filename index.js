@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
-require('dotenv').config();
+// require('dotenv').config();
 var express = require('express');
-var path =require('path');
 var swig = require('swig');
 var bodyParser = require('body-parser');
 var bloodBankBot = require('./Bot/bloodBankBot');
@@ -24,12 +23,11 @@ mongoose.connection.on('disconnected', () => {
   console.log("faslt");
         setTimeout(dbConnect, 5000);
     });
-
 var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.engine('html',swig.renderFile);
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', './views');
 app.set('view engine','html');
 app.listen((process.env.PORT || 3000));
 
