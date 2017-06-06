@@ -1,6 +1,8 @@
 /* eslint-disable no-console */
-// require('dotenv').config();
+require('dotenv').config();
 var express = require('express');
+var path =require('path');
+var swig = require('swig');
 var bodyParser = require('body-parser');
 var bloodBankBot = require('./Bot/bloodBankBot');
 var mongoose=require('mongoose');
@@ -26,11 +28,17 @@ mongoose.connection.on('disconnected', () => {
 var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.engine('html',swig.renderFile);
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine','html');
 app.listen((process.env.PORT || 3000));
 
 app.get('/', function (req, res) {
   res.send('This is BloodBankBot Server!');
   bloodBankBot.setBotConfiguration();
+});
+app.get('/privacy', function (req, res) {
+  res.render('privacypolicy.html');
 });
 
 // Facebook Webhook
