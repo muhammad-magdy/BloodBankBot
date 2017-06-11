@@ -21,5 +21,18 @@
   "PatientSaveMsg":"Thank you, Now I am searching for donors to you",
   "bloodRequest":"Some one you can help need blood near you",
   "bloodRequestDetails":"patient Name:{name} if you are ready for donation call him ",
-  "call":"Call "
+  "call":"Call ",
+  "Thanks":"Thanks",
+  "DonationAlert":"Donation Alert",
+  "DonationAlertOptions":"When i can notify you for donation?",
+  "ASAP":"ASAP",
+  "oneMonth":"After Month",
+  "sixMonths":"After 6 Months",
+  "unsubscribe":"unsubscribe",
+  "cancel":"Cancel",
+  "DonationAlertChanged":"Ok, I've changed the notification frequency!",
+  "unsubscribeMsg":"Ok, I've deactivated your subscribtion, hope to see you again to be part of large blood network",
+  "cancelMsg":"No data changed",
+  "ThanksMsg":"Most welcome see you soon"
+
 }

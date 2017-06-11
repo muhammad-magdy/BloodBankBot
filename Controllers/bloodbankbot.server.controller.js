@@ -10,6 +10,27 @@ var entry = new bloodbankUser({
       entry.save(cb);
 }
 
+exports.setDonorAlertDate = function (userId, value, cb) {
+  var condition = { _id: userId };
+  var updateQuery = {
+    $set: {
+      "donor.alertDate": value,
+      "donor.updatedOn": Date.now()
+    }
+  };
+  bloodbankUser.update(condition, updateQuery, cb);
+}
+exports.setDonorIsActive = function (userId, value, cb) {
+  var condition = { _id: userId };
+  var updateQuery = {
+    $set: {
+      "donor.isActive": value,
+      "donor.updatedOn": Date.now()
+    }
+  };
+  bloodbankUser.update(condition, updateQuery, cb);
+}
+
 exports.setIsDonor = function (userId, value, cb) {
   var condition = { _id: userId };
   var updateQuery = {
@@ -39,11 +60,14 @@ exports.getUserData = function (userId, cb) {
 }
 
 exports.getMatchedBloodDonors = function (userId, compatibleBloodTypes, location, donationType, cb) {
+  var currentDate= new Date();
+  currentDate.setHours(0,0,0,0);
   bloodbankUser.find({
     _id: { $ne: userId },
     "donor.isActive":{$ne:false},
     "donor.bloodType": { $in: compatibleBloodTypes },
     "donor.donationType": { $in: ["All", donationType] },
+    "donor.alertDate": { $lte: currentDate },
     "donor.location": {
       $near: {
         $geometry: { type: 'Point', coordinates: [location.long, location.lat] },
@@ -63,13 +87,16 @@ exports.updateUserLanguage = function (userId, userLanguage, cb) {
 };
 
 exports.updateDonor = function (user) {
+  var currentDate= new Date();
+  currentDate.setHours(0,0,0,0);
   var donorData = {
     donationType: user.donationType,
     bloodType: user.bloodType,
     location: { type: 'Point', coordinates: [user.location.long, user.location.lat] },
     address: user.location.address,
     isActive: true,
-    updatedOn: Date.now()
+    updatedOn: Date.now(),
+    alertDate: currentDate
   };
   var condition = { _id: user.id };
   var updateQuery = {

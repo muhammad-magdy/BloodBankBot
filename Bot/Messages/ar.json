@@ -21,5 +21,17 @@
   "PatientSaveMsg":"شكرا ليك, جاري البحث عن متبرعين لحالتك",
   "bloodRequest":"في حاله قريبه من عنوانك نفس فصيله دمك محتاجه تبرع بالدم",
   "bloodRequestDetails":"أسم الحاله: {name} لو جاهز للتبرع كلمه",
-  "call":"أتصل"
+  "call":"أتصل",
+  "Thanks":"شكرا",
+  "DonationAlert":"تغير اخطارات التبرع",
+  "DonationAlertOptions":"متي يمكنني أخطارك للتبرع؟",
+  "ASAP":"في أقرب وقت",
+  "oneMonth":"بعد شهر",
+  "sixMonths":"بعد 6 أشهر",
+  "unsubscribe":"إلغاء الاشتراك",
+  "cancel":"إلغاء",
+  "DonationAlertChanged":"تم تغير اخطارات التبرع",
+  "unsubscribeMsg":"تمام, تم إلغاء اشتراكك ",
+  "cancelMsg":"لم تتغير البيانات",
+  "ThanksMsg":"العفو, اراك قريبا"
 }

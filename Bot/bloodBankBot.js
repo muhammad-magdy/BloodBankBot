@@ -184,6 +184,111 @@ exports.receivedMessage = function (event) {
           }
         });
         break;
+      case 'ThanksDonor'  :
+        bloodbankUserCtrl.getUserData(senderID, function (err, doc) {
+          if (err)
+            console.log(err);
+          var lang = "en";
+          if (doc && doc != "undefined" && doc.Language != "") {
+            lang = doc.Language;
+          }
+          localizify.setLocale(lang);
+          sendTextMessage(senderID, localizify.t('ThanksMsg'));
+        });
+        break;
+      case 'DonationAlert'  :
+        bloodbankUserCtrl.getUserData(senderID, function (err, doc) {
+          if (err)
+            console.log(err);
+          var lang = "en";
+          if (doc && doc != "undefined" && doc.Language != "") {
+            lang = doc.Language;
+          }
+          sendDonationAlertOptions(senderID, lang);
+        });
+        break;
+      case 'ASAP':
+        var date= new Date();
+        date.setHours(0,0,0,0);
+        bloodbankUserCtrl.setDonorAlertDate(senderID, date, function (err) {
+          if (err) {
+            console.log(err);
+          }
+          bloodbankUserCtrl.getUserData(senderID, function (err, doc) {
+          if (err)
+            console.log(err);
+          var lang = "en";
+          if (doc && doc != "undefined" && doc.Language != "") {
+            lang = doc.Language;
+          }
+          localizify.setLocale(lang);
+          sendTextMessage(senderID, localizify.t('DonationAlertChanged'));
+        });
+        });
+        break;
+      case 'oneMonth':
+        bloodbankUserCtrl.setDonorAlertDate(senderID, addMonths(new Date(), 1), function (err) {
+          if (err) {
+            console.log(err);
+          }
+          bloodbankUserCtrl.getUserData(senderID, function (err, doc) {
+          if (err)
+            console.log(err);
+          var lang = "en";
+          if (doc && doc != "undefined" && doc.Language != "") {
+            lang = doc.Language;
+          }
+          localizify.setLocale(lang);
+          sendTextMessage(senderID, localizify.t('DonationAlertChanged'));
+        });
+        });
+        break;
+      case 'sixMonths':
+        bloodbankUserCtrl.setDonorAlertDate(senderID, addMonths(new Date(), 6), function (err) {
+          if (err) {
+            console.log(err);
+          }
+          bloodbankUserCtrl.getUserData(senderID, function (err, doc) {
+          if (err)
+            console.log(err);
+          var lang = "en";
+          if (doc && doc != "undefined" && doc.Language != "") {
+            lang = doc.Language;
+          }
+          localizify.setLocale(lang);
+          sendTextMessage(senderID, localizify.t('DonationAlertChanged'));
+        });
+        });
+        break;
+      case 'unsubscribe':
+        bloodbankUserCtrl.setDonorIsActive(senderID, false, function (err) {
+          if (err) {
+            console.log(err);
+          }
+          bloodbankUserCtrl.getUserData(senderID, function (err, doc) {
+          if (err)
+            console.log(err);
+          var lang = "en";
+          if (doc && doc != "undefined" && doc.Language != "") {
+            lang = doc.Language;
+          }
+          localizify.setLocale(lang);
+          sendTextMessage(senderID, localizify.t('unsubscribeMsg'));
+        });
+        });
+        break;
+      case 'cancel':
+        bloodbankUserCtrl.getUserData(senderID, function (err, doc) {
+          if (err)
+            console.log(err);
+          var lang = "en";
+          if (doc && doc != "undefined" && doc.Language != "") {
+            lang = doc.Language;
+          }
+          localizify.setLocale(lang);
+          sendTextMessage(senderID, localizify.t('cancelMsg'));
+        });
+        break;
       case 'Blood':
       case 'Plasma':
       case 'Platelets':
@@ -243,7 +348,7 @@ exports.receivedMessage = function (event) {
             localizify.setLocale(lang);
             if (doc && doc != "undefined" && doc.isDonor == true) {
               bloodbankUserCtrl.updateDonor(user);
-              sendTextMessage(senderID, localizify.t('donorSaveMsg', { name: doc.userInfo.first_name }));
+              sendDonorThanksMessage(senderID, lang, doc.userInfo.first_name);
             }
             else {
               sendTextMessage(senderID, localizify.t('phoneNumber'));
@@ -284,6 +389,7 @@ exports.receivedMessage = function (event) {
           bloodbankUserCtrl.getMatchedBloodDonors(recipientID, matchedBloodTypes, user.location, user.donationType, function (err, docs) {
             if (err)
               console.log(err);
+              console.log(docs);
             if (docs) {
               docs.forEach(function (doc) {
                 sendBloodRequestMessage(doc._id, doc.Language, user.phoneNumber, userName);
@@ -410,6 +516,17 @@ exports.receivedPostback = function (event) {
       case 'Lang':
         sendLanguageQuestion(senderID);
         break;
+      case 'DonationAlert'  :
+        bloodbankUserCtrl.getUserData(senderID, function (err, doc) {
+          if (err)
+            console.log(err);
+          var lang = "en";
+          if (doc && doc != "undefined" && doc.Language != "") {
+            lang = doc.Language;
+          }
+          sendDonationAlertOptions(senderID, lang);
+        });
+        break;
       default:
         //  handleOtherRecievedMessage(senderID);
         break;
@@ -483,6 +600,11 @@ function sendBloodRequestMessage(recipientId, language, phoneNumber, userName) {
                 type:"phone_number",
                 title:localizify.t("call"),
                 payload:phoneNumber
+              },
+              {
+                type: "postback",
+                title: localizify.t('DonationAlert'),
+                payload: 'DonationAlert'
               }]
             }]
         }
@@ -553,6 +675,70 @@ function sendUserTypeQeustionMessage(recipientId, lang) {
     };
     callSendAPI(messageData);
 }
+
+function sendDonorThanksMessage(recipientId, lang, firstName) {
+    localizify.setLocale(lang);
+    var textMsg = localizify.t('donorSaveMsg', { name: firstName });
+    var messageData = {
+      recipient: { id: recipientId },
+      message: {
+        text: textMsg,
+        quick_replies: [
+          {
+            "content_type": "text",
+            "title":localizify.t('Thanks') ,
+            "payload": "ThanksDonor"
+          },
+          {
+            "content_type": "text",
+            "title": localizify.t('DonationAlert'),
+            "payload": "DonationAlert"
+          }
+        ]
+      }
+    };
+    callSendAPI(messageData);
+}
+
+function sendDonationAlertOptions(recipientId, lang) {
+    localizify.setLocale(lang);
+    var textMsg = localizify.t('DonationAlertOptions');
+    var messageData = {
+      recipient: { id: recipientId },
+      message: {
+        text: textMsg,
+        quick_replies: [
+          {
+            "content_type": "text",
+            "title":localizify.t('ASAP') ,
+            "payload": "ASAP"
+          },
+          {
+            "content_type": "text",
+            "title": localizify.t('oneMonth'),
+            "payload": "oneMonth"
+          },
+          {
+            "content_type": "text",
+            "title": localizify.t('sixMonths'),
+            "payload": "sixMonths"
+          },
+          {
+            "content_type": "text",
+            "title": localizify.t('unsubscribe'),
+            "payload": "unsubscribe"
+          },
+          {
+            "content_type": "text",
+            "title": localizify.t('cancel'),
+            "payload": "cancel"
+          }
+        ]
+      }
+    };
+    callSendAPI(messageData);
+}
+
 
 function sendLanguageQuestion(userId) {
   bloodbankUserCtrl.getUserData(userId, function (error, doc) {
@@ -933,5 +1119,14 @@ function getMatchedBloodTypes(donationType, bloodType) {
   }
 }
 
-
-
+function addMonths (date, count) {
+  if (date && count) {
+    var m, d = (date = new Date(+date)).getDate()
+    date.setMonth(date.getMonth() + count, 1)
+    m = date.getMonth()
+    date.setDate(d)
+    if (date.getMonth() !== m) date.setDate(0)
+  }
+  date.setHours(0,0,0,0);
+  return date
+}

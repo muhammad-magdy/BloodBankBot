@@ -20,7 +20,8 @@ var donorSchema = {
   address: String,
   location: locationSchema,
   isActive: { type: Boolean, default: false },
-  updatedOn: { type: Date, default: Date.now }
+  updatedOn: { type: Date, default: Date.now },
+  alertDate: { type: Date, default: Date.now }
 };
 
 var requestSchema = {
@@ -48,7 +49,6 @@ var bloodBankBotSchema = new Schema({
     _id: false
   });
 bloodBankBotSchema.index({ "donor.location.coordinates": "2dsphere" });
-// bloodBankBotSchema.index({ "donor.location": "2dsphere" });
 module.exports = mongoose.model('bloodbankUser', bloodBankBotSchema);
 
 
