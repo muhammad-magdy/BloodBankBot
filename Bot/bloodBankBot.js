@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-// require('dotenv').config();
+require('dotenv').config();
 const localizify = require('localizify');
 var request = require('request');
 var events = require('events');
@@ -184,18 +184,6 @@ exports.receivedMessage = function (event) {
           }
         });
         break;
-      case 'ThanksDonor'  :
-        bloodbankUserCtrl.getUserData(senderID, function (err, doc) {
-          if (err)
-            console.log(err);
-          var lang = "en";
-          if (doc && doc != "undefined" && doc.Language != "") {
-            lang = doc.Language;
-          }
-          localizify.setLocale(lang);
-          sendTextMessage(senderID, localizify.t('ThanksMsg'));
-        });
-        break;
       case 'DonationAlert'  :
         bloodbankUserCtrl.getUserData(senderID, function (err, doc) {
           if (err)
@@ -222,7 +210,7 @@ exports.receivedMessage = function (event) {
             lang = doc.Language;
           }
           localizify.setLocale(lang);
-          sendTextMessage(senderID, localizify.t('DonationAlertChanged'));
+          sendTextMessage(senderID, localizify.t('DonationAlertChanged', { time: localizify.t('ASAP') }));
         });
         });
         break;
@@ -239,7 +227,7 @@ exports.receivedMessage = function (event) {
             lang = doc.Language;
           }
           localizify.setLocale(lang);
-          sendTextMessage(senderID, localizify.t('DonationAlertChanged'));
+          sendTextMessage(senderID, localizify.t('DonationAlertChanged', { time: localizify.t('oneMonth') }));
         });
         });
         break;
@@ -256,7 +244,7 @@ exports.receivedMessage = function (event) {
             lang = doc.Language;
           }
           localizify.setLocale(lang);
-          sendTextMessage(senderID, localizify.t('DonationAlertChanged'));
+          sendTextMessage(senderID, localizify.t('DonationAlertChanged', { time: localizify.t('sixMonths') }));
         });
         });
         break;
@@ -686,13 +674,28 @@ function sendDonorThanksMessage(recipientId, lang, firstName) {
         quick_replies: [
           {
             "content_type": "text",
-            "title":localizify.t('Thanks') ,
-            "payload": "ThanksDonor"
+            "title":localizify.t('ASAP') ,
+            "payload": "ASAP"
           },
           {
             "content_type": "text",
-            "title": localizify.t('DonationAlert'),
-            "payload": "DonationAlert"
+            "title": localizify.t('oneMonth'),
+            "payload": "oneMonth"
+          },
+          {
+            "content_type": "text",
+            "title": localizify.t('sixMonths'),
+            "payload": "sixMonths"
+          },
+          {
+            "content_type": "text",
+            "title": localizify.t('unsubscribe'),
+            "payload": "unsubscribe"
+          },
+          {
+            "content_type": "text",
+            "title": localizify.t('cancel'),
+            "payload": "cancel"
           }
         ]
       }

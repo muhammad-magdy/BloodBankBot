@@ -1,8 +1,8 @@
 {
   "phoneNumber":"Please, tell me your phone number without country code (for ex 01234567890) to share it with Donors, so they can reach you",
   "invalidPhoneNumber":"Invalid Phone number! Please provide correct one (without country code for ex 01234567890)",
-  "greeting":"Welcome {name} to Blood Bank Bot!\nPlease, choose your language.",
-  "changeLanguage":"Please, choose your language",
+  "greeting":"Welcome {name} to Blood Bank Bot!\nPlease, choose your language?",
+  "changeLanguage":"Please, choose your language?",
   "userTypeQuestion":"How can I help you?",
   "donor":"I am a Donor",
   "patient":"Requesting Blood",
@@ -17,7 +17,7 @@
   "all":"All",
   "donorsNumber":"How Many Donors do you need?",
   "unknown":"I'm not sure I understood. How I can help you?",
-  "donorSaveMsg":"Thanks {name}! I will notify you when anyone near to your location with a matching blood type need blood donation.",
+  "donorSaveMsg":"Thanks {name}! When can I notify you for donation?",
   "PatientSaveMsg":"Thanks! I am searching for donors.",
   "bloodRequest":"Someone near you need blood donation.",
   "bloodRequestDetails":"Patient Name: {name}. If you are ready to donate, please, call them.",
@@ -30,8 +30,7 @@
   "sixMonths":"After 6 Months",
   "unsubscribe":"Unsubscribe",
   "cancel":"Cancel",
-  "DonationAlertChanged":"Ok, I've changed the notification frequency.",
+  "DonationAlertChanged":"Ok, I will notify you for donation requests {time}.",
   "unsubscribeMsg":"Ok, I've unsubscribed you. Hope to see you back again, later.",
-  "cancelMsg":"No data changed",
-  "ThanksMsg":"Most welcome see you soon"
+  "cancelMsg":"No data changed"
 }

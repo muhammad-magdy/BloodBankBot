@@ -6,10 +6,10 @@
   "userTypeQuestion":"كيف يمكنني مساعدتك؟",
   "donor":"أنا متبرع",
   "patient":"في حاجة لمتبرع بالدم",
-  "location":"حدد عنوان التبرع",
+  "location":"حدد عنوان التبرع؟",
   "bloodType":"ما هى فصيلة دمك؟",
-  "donorBloodDonationType":"حدد نوع التبرع الذي يمكنك المشاركة به.",
-  "patientBloodDonationType":"حدد نوع التبرع الذي تحتاج إليه.",
+  "donorBloodDonationType":"حدد نوع التبرع الذي يمكنك المشاركة به؟",
+  "patientBloodDonationType":"حدد نوع التبرع الذي تحتاج إليه؟",
   "blood":"دم عادي",
   "powerRed":"الخلايا الدموية",
   "platelets":"الصفائح الدموية",
@@ -17,7 +17,7 @@
   "all":"الكل",
   "donorsNumber":"كم متبرع تحتاج؟",
   "unknown":"لست متأكدا من أنني فهمت. كيف يمكنني مساعدتك؟",
-  "donorSaveMsg":"شكرا {name}! وسوف أخطرك عندما أجد شخص بالقرب من موقعك من نوع الدم مطابق يحتاج لتبرع بالدم.",
+  "donorSaveMsg":"شكرا {name}! متي يمكنني أخطارك للتبرع؟",
   "PatientSaveMsg":"شكرا! نبحث عن متبرعين لحالتك.",
   "bloodRequest":"شخص بالقرب منك بحتاج التبرع بالدم.",
   "bloodRequestDetails":"أسم الحاله: {name} لو جاهز للتبرع كلمه",
@@ -30,8 +30,7 @@
   "sixMonths":"بعد 6 أشهر",
   "unsubscribe":"إلغاء الإشتراك",
   "cancel":"إلغاء",
-  "DonationAlertChanged":"تم تغير إخطارات التبرع",
+  "DonationAlertChanged":"حسنا سوف اخطرك للتبرع بالدم {time}.",
   "unsubscribeMsg":"تم إلغاء إشتراكك",
-  "cancelMsg":"لم تتغير البيانات",
-  "ThanksMsg":"عفوا, أراك قريبا"
+  "cancelMsg":"لم تتغير البيانات , أراك قريبا"
 }
