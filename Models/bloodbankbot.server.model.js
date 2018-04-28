@@ -48,7 +48,16 @@ var bloodBankBotSchema = new Schema({
   {
     _id: false
   });
-bloodBankBotSchema.index({ "donor.location.coordinates": "2dsphere" });
+
+bloodBankBotSchema.index({ "donor.location": "2dsphere" });
+bloodBankBotSchema.index({ "requests.location": "2dsphere"});
+
+bloodBankBotSchema.index({ "donor.location.coordinates": "2dsphere"});
+bloodBankBotSchema.index({ "requests.location.coordinates": "2dsphere"});
+
+bloodBankBotSchema.index({ "requests.location.coordinates": "2d"});
+bloodBankBotSchema.index({ "donor.location.coordinates": "2d"});
+
 module.exports = mongoose.model('bloodbankUser', bloodBankBotSchema);
 
 
