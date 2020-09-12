@@ -5,11 +5,17 @@ var path = require('path');
 nunjucks = require( 'nunjucks' );
 var bodyParser = require('body-parser');
 var bloodBankBot = require('./Bot/bloodBankBot');
+const dbOptions = {  
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  keepAlive: true, 
+  poolSize: 10,
+};
 var mongoose=require('mongoose');
 mongoose.Promise = global.Promise
 
 const dbConnect = function () {
-  mongoose.connect(process.env.DB_ConnectionString, { uri_decode_auth: true },
+  mongoose.connect(process.env.DB_ConnectionString, dbOptions,
     function (error) {
       if (error)
         console.log(error);
