@@ -2,7 +2,7 @@
 require('dotenv').config();
 var express = require('express');
 var path = require('path');
-var swig = require('swig');
+nunjucks = require( 'nunjucks' );
 var bodyParser = require('body-parser');
 var bloodBankBot = require('./Bot/bloodBankBot');
 var mongoose=require('mongoose');
@@ -26,11 +26,17 @@ mongoose.connection.on('disconnected', () => {
 var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.engine('html',swig.renderFile);
+app.engine('html',nunjucks.render);
+
+nunjucks.configure('views', {
+  autoescape: true,
+  express: app
+});
 app.set('views', './views');
 app.set('view engine','html');
 app.use(express.static(path.join(__dirname, 'public')));
 app.listen((process.env.PORT || 3000));
+
 
 app.get('/', function (req, res) {
   res.render('index.html');
